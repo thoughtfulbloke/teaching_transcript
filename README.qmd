@@ -1,0 +1,425 @@
+---
+title: "The way I teach R"
+author: "David Hood"
+format: gfm
+editor: source
+---
+
+## Foreword
+
+This is a text version of, as I currently run it, my introductory R course where the goal is to cover enough R people will be comfortable with the example code when reading books or web pages. Timed for, as I deliver it, 1 hour 50 minutes (talking at New Zealand speeds, which may be faster than you think).
+
+The plain text outside the code blocks is things I might say as I am demonstrating things. The exact wording vary on the day given the vibe of the audience, but it is the meta-explanation of what we are doing and why. I am assuming most people interested in teaching R can imagine what I am demonstrating as I talk.
+
+The code blocks have the example code being worked through. This is just reference pieces to the accompanying R file in this directory, which course participants would have their own copy (coursework.R). As do they have the course data file (pulse.csv). They also have have a written handout (as a pdf) for the course, that covers the content in a basic step by step way with references, but lacks the contextual explanation. So, for example, it has a list of the comparison operators in it for the subsetting section. They got these files via a download link in the confirmation message for the session a few days in advance (or when signing up for last minute attendees. The confirmation message included guidance on installing R and RStudio.
+
+Any paragraphs in italics explain what I am doing in relation to the accompanying narrative text. This is really as prompts for the kind of things done that are outside of R code.
+
+This version of what I teach was written in my own time, and I have constructed the example file in my own time. Feel free to read and be inspired by it, but if directly copying/using it is Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), which in practice means acknowledge me if drawing on this.
+
+## The course
+
+Kia ora, e hoa mā. Nau mai ki tēnei kōrero.
+
+Through the process of going through examples of the common things people want to do when analysing data, the intent is to learn enough R that when you go to read specific advice on doing something in R, the code makes sense.
+
+But before we dive into R, I have the folder for this course on my computer. Somewhere. It doesn't matter where you have your copy of the folder so long as you are able to find the folder using an open file dialog box. This is because the easiest way to work is to have a project folder with the analysis code and the data in it, that way we could be months later on a different computer and everything would still work fine with the folder in a new place.
+
+*Showing the example data in Excel*
+
+The data we will be using in this session is some fictional pulse data from a triathlon, with columns of names, text, numbers, and dates. There is even a missing value so we can see how that will affect things. For shifting data between programs, it is easiest if it is "tidy" data with a rectangular block of data with one row of headings at the top, a row for each observation that you are making a record of, and a column for each thing you care about keeping track of about the observation- more formally a column for each variable. Also, as foreshadowing, note that the last three column headings have spaces in the names.
+
+This rectangular block of data has been saved as a csv file, a very common format for shifting data between spreadsheet, database, or analysis programs. This can be read into R without needing any added helper libraries. For data in other formats - like Excel files, or SPSS files, or sound files, or geographic information files - we would need to add helper libraries to our copy of R.
+
+*Closing the csv and opening RStudio*
+
+We are using both R and RStudio today. When I opened RStudio, R opened inside it. You can think of R as being the engine room we are sending commands to, and if I had opened R I would only have the part called the console. Because I opened RStudio I get all the added helper windows and menus around it for making life easier. Think of it as the control deck monitoring and sending messages to the engine room.
+
+*Use session menu - Set working directory - Choose directory*
+
+The first job is to tell R to pay attention to our project folder. From the Session menu, choose Set Working Directory - Choose Directory and find and select the project folder.
+
+This writes the R code for setting the folder into the Console and runs it. As a function language, like functions in Excel, there is a word R knows about, parentheses, and in the parentheses will be the input, in this case the text of the pathway to the folder. In double quotes because it is text.
+
+Lets all take a minute at this point to get underway, and make sure you have set the working directory to the example folder.
+
+As a metaphor for carrying you through the next couple of hours, you can think of it as being like a kitchen spice grinder. We have a model of spice grinder, a funnel (the parentheses), and we out ingrediants into the funnel and something happens.
+
+But because that command went directly into console, there is no audit trail of what happened, nor is there any ability to automatically repeat it in the future. So normal practice is to write commands out so they can be saved and repeated.
+
+*shows file menu*
+
+People often create R scripts, Rmarkdown Documents, or Quarto Documents to record steps in R. Today we will be using the basic R script and focusing on the language, but the others allow you to include human writing mixed in together with R code. We could open up a new script writing area and save it to the project folder to repeat in the future, but we are going to do the equivalent of coming back a few months later and reopening an existing file.
+
+*open coursework.R*
+
+After writing commands, you can run them in the console. The first command we are going use is reading in the csv file with read.csv.
+
+*run just the read.csv("pulse.csv") part of the line*
+
+```         
+read.csv("pulse.csv")
+```
+
+You can select written commands and push the run button at the top of the screen. So if we take the read.csv function we can put in the text, with double quotes as it's text, of the pathway to file. The same kind of way of writing as web page paths use. But in this case, because the file is in the folder we told R to pay attention to, we only need the name of the file.
+
+But if you only run the read.csv part, it runs the command in console and spills the contents of the file out over the console, so we want to store it somewhere.
+
+```         
+pulse <- read.csv("pulse.csv")
+```
+
+To store things, build an arrow pointing to the right and given the storage a name to refer to it by in the future. A lot like putting the data in a labelled jar. As well as selecting it, you can run an entire line by being clicked on the same line with nothing selected and press Control - Enter (on Windows) or Command - Return (on Macintosh), or just press the Run button.
+
+If everything works OK, R just does it thing- you will get warnings if R has non critical concerns, and error messages with technical explanations if there is a serious problem.
+
+You will also see reading in data works because it appears in the Environment window, that shows everything you have stored in R.
+
+Once stored, like a stored jar on a shelf, we can take the jar and use it in other functions.
+
+```         
+summary(pulse)
+```
+
+The summary makes a basic summary of each column in the data. It is not very informative in the case of text columns but it does make the common numeric summaries of number columns. It does also show the number of missing, not available, NA, entries.
+
+```         
+str(pulse)
+```
+
+One of the most import functions to know about is str for structure. And that's telling me about the kind of data I'm working with. So if I take this block of saved data saved under the name pulse. and I feed it into the str function, then run that in the console I get a report saying it's a data frame, and a data frame is basically a spreadsheet. There are those 60 observations of 11 variables.
+
+The 1st column is called Name. It's a character column. The second column is called Gender. It's a character column. The next column has the name before and it's an integer column, and so on.
+
+And the reason that str is such an important function, and you will use it a lot for figuring out when something doesn't seem to be behaving, is that the kind of questions you can ask about data depend on the kind of data it is. You can only ask maths questions of numbers. You can't ask maths questions of text. You can only ask date questions of dates. You can't ask date questions of pieces of text.
+
+So the kind of column it is is really important. And when a function doesn't seem to be giving you the answers that you think it should one of the first things to do is to use the str function on your data and just check "Yes, it is the kind of data I thought it was", and that it's the right kind of data to be doing this function with.
+
+It is also important to be familiar with the data after it has been read into R, as column names may have been changed to make them legal in R (for instance by converting spaces to dots). And to return to the foreshadowing, you might notice there are no spaces in the last three column names. Within R, refer to things by their name in R. So lets take a couple of minutes to give things a go and collect up questions at this point.
+
+So R, like other professional level analysis tools, assumes that there's only one kind of data in a particular column- that there is no stray text in a column of numbers (for instance text notes at the bottom). And that's the kind of thing that shows up with checking, as does other complications like having blank rows at the top.
+
+You can have the function work in a different way by checking the input, like putting different ingredients into the spice grinder.
+
+If you are experimenting, it is not a bad idea to copy and paste the line being tinkered with first. If running both, the last one run is the winning change. But here we are just tinkering. If I click inside the parentheses after any current settings, I can type a comma, then hit the tab key on the keyboard to bring up a list of possible settings, like skip to skip to rows or nrows to only read in a certain number of rows. So lets have a play with that for a couple of minutes, being sure to return to reading in all the data the way we have started with at the end, so we have all the data for later exercises. If a setting says it is a logical value, rather than numbers or text, you need to shout TRUE or FALSE at the setting to change it.
+
+Back when I checked the structure of the pulse data, the eagled eyed among you might have noticed that the dob column, the date of birth column has been read in as a column of text. So we can't ask date questions of the column at the moment. One way of fixing this would be back in reading in the pulse data in with an added setting for which kind of data is each column. But I also want to show you changing the kind of column data is after the fact so you can ask different questions of your data. And for that we might use a function like as.Date.
+
+as.Date is a function which takes characters, and if they are actually dates in ISO year month day order, turns them into dates. So I want to feed something into this function.
+
+We've got this stored block of data called pulse. But I don't want to feed in all of pulse. There's lots of columns that I'm not interested in this case. So something when you look at example R code, you'll see a lot as a dollar sign, and you can think of the dollar sign as the reaching inside symbol. So I can say, take my block of pulse data and reach inside for a particular column. And when I type the dollar sign I'm getting an auto pop up complete for names of different columns, and I could pick the dob one and I could hit tab to autocomplete it.
+
+```         
+as.Date(pulse$dob)
+```
+
+So that says, Take whatever is in the bob column at the moment, and feed it into the as date function to convert it to dates. But if I just ran that as is, it spills it all over the bench top because I'm not saving it anywhere. So for doing this. I'm going to want to build an arrow for putting it somewhere. And I might want to put it somewhere new within the existing data set, like a column called birth. So what I can do is type the word pulse with a dollar sign, then type in the new column name.
+
+```         
+pulse$birth <- as.Date(pulse$dob)
+```
+
+And now, I'm saying reach into the pulse data, take the date of birth, feed it into the as.Date function to get something new out as a bunch of dates, and then store it. Go to the pulse data and reach inside to the birth column. And if there isn't a birth column, which there isn't yet, it's just going to invent the one that I need.
+
+So if I run that statement, I've now got 60 observations of 12 variables, because it's added an extra variable. And as a quick look up of what columns am I working with, if I click the little play button just to the left of the name pulse, I'm seeing the column names, and I've got a new one called birth, and it is a date.
+
+This is the str function at work again. Essentially, you can look it up inside the environment tab. But the big idea here is you can change the kind of data after the fact to ask better questions.
+
+So it's time for some exercise and thinking time, where this time you are typing the line yourself. Be aware R is case sensitive, so you do need to capitalise the D in Date for it to know what you are talking about. If you manage to really muck up the data, just rerun the earlier lines to repeat things.
+
+And it's all good, hey? So let's make some horrible looking exploratory graphs with some functions. And we've got a function like the word plot. Make me a graph.
+
+```         
+plot(pulse$before, pulse$after)
+hist(pulse$height)
+boxplot(pulse$height ~ pulse$gender)
+```
+
+If I use a function word like hist, and put in height, hist is for histogram and I get a histogram. The numeric distribution of that height.
+
+If I use a function like boxplot, which is the distribution of a numeric variable on the basis of a categorical variable. It's a distribution of numbers by groups. This uses a new symbol that you will see in some places if you are looking at example R code - the tilda, the squiggly hyphen in the top right corner of the keyboard if you hold down the shift key. Whenever you see tilda, you can think of it as meaning controlled by, or dependent on or grouped by. So in this case it is a boxplot of the height column grouped by the gender column, and I get one boxplot for each of the categories in my data. And if I want a copy I could hit the Export button in the Plots window.
+
+But they are horrible looking exploratory graphs. And if I want to change that I might be adding settings, changing the ingredients in the spice mix. I can, just like we did with read.csv, click into the function type a comma and hit tab. But this time we might want a bit more info, so we are going to check out the help. Down in the same window group as the plots were appearing, there is a help tab. If I type hist into the search box at the top I get the help page for the hist function, if I type boxplot I get the help for boxplot, and if I type plot I get overwhelmed with possibilities. The help search box is fine most of the time, but sometimes you get better results using R code directly. I can type a question mark and the word plot into the console, or I can click into the word plot in the script and press the F1 key (though I may need to hold down the function key at the same time depending on my keyboard). Either way, that makes it much easier to find The Default Scatterplot Function which as it is official plot.default is found with the starts with searches.
+
+Help pages have the arguments for the function, the possible settings, near the top. Then they may have additional discussion of details, and finish with some references and example code that you can run. Where there is a dot dot dot ellipsis in the function, that can lead off to other relevant places. So I might go from plot to par, and so on until I find pch is the setting for plot character and that I can use double quotes to set it to a text character, and so make a mystery graph of question marks. If I was setting a colour setting, I could either set the colours by name as a piece of text, or use a hash symbol and two character for the amount of red, green. and blue light. Colour codes are hexidemical, base 16 with steps from 0 to F, so 00 is none and FF is all.
+
+Now, the reason I'm introducing help at this stage is whenever you are reading a web page example of R code, or you are reading a textbook, or you are reading a advice page, and there's some example our code in there- If you're ever wondering what is this setting doing in this example, this is how you find out. You find that function, and then you can, in the arguments, read the detail of what the setting is actually doing, and hopefully understand why the person who wrote the help set it. So that's the big reason for introducing help at this stage is so that examples in the future make sense. So what I would like to do is declare a whole 5 min exercise break. I'd like you to have a go at adding settings and just getting the graphs to look different, and and try that kind of thing by using the help. And the express goal of this exercise is really to get you used to looking up functions in help and using that info.
+
+Okay, so yes, we made some horrible looking exploratory graphs. But, there are many,many other helper libraries that can be added to R. These include some for making fancy graphs easier. We are introducing the ggplot2 helper library here, but I am running an hour and a half session specifically on using ggplot2 tomorrow. Today's focus is on how there are helper libraries, called packages, and we can install them, and once installed we can use them. So it is a two-part process. One part is you need to have a helper library installed on your computer. Once it's installed, you need to activate it for a particular day before using it. So, for example, installing ggplot2, because I've read that it's a great way for making graphs. I might go to the packages tab in the bottom right- down by plots and help- and that shows all the installed helper libraries on my computer. So there are lots and lots of helper libraries that do extra things. Helper libraries for reading in Excel files rather than csv files, helper libraries for reading in sound files, helper libraries for working with spatial information, specialist date libraries, and so on, and so on, and so on.
+
+Now, I've already got ggplot2 installed. So I don't need to go to the install button at the top of packages, and I don't need to type in ggplot2, and if I did need to do this I would note the install dependencies tick box. If that's ticked, and I strongly suggest if you are installing libraries to keep that ticked, it means if this helper library needs other helper libraries, it will sort it all out. That's a good thing. So I could press the install button here and go off onto the Internet to the official storage areas and add extra helper libraries. But because I've got it in my list of libraries. I don't need to do so on this occasion. I might also need to install it again if I had fully updated R to a new version. But today, as installing libraries is a one off job, I just need to wake it up on this occasion so I can use the commands from it.
+
+```         
+library(ggplot2)
+```
+
+For waking up libraries there is a library command. So I say, library ggplot2, and that's like going down to the library to get a book out. Once I've got the book in my hand I can read the book. When I run that command you might randomly get extra messages in the console as it starts, like some reading recommendations. But the big thing is that commands are now available. Because the commands are available, I will also be able to find them in the help tab.
+
+Now that I both have my ggplot2 library installed, and I've woken it up by running a library command, I can use commands from this library. Like this command asking it to make a ggplot2 style graph.
+
+```         
+ggplot(pulse, aes(x=height, y=weight, colour=gender, shape=did.swim)) + geom_point()
+```
+
+The first setting is what block of data to use, because ggplot likes blocks of data. The second setting, the aesthetics, is "what job are columns from my data doing?". The height is controlling the x-axis. The weight is controlling the y-axis. Colour (spelt in the New Zealand fashion, but either works) is being controlled by the gender column. Shape is being controlled by did.swim. Then, because the ggplot function assembles a graph with plus signs the geom_point is added to express the data as a point graph.
+
+If I tried to run that, I get an error message and it says there's stuff wrong. A continuous variable cannot be mapped to shape. And if I went back and checked in my data, remember how I said that the kind of data determines what you can do with it.
+
+Shape is a column of numbers, but it is only zeros and ones. However, because numbers can in theory be an infinite number of numbers. It's not letting me match specific shapes to it. There are too many possibilities unless I restrict that infinite amount of choice down. There are a couple of ways I could do that. One is, there is a kind of data in R called factors. Factors declares something to be a limited set of values in order, and if I declared the did.swim column to be a limited set by making it a factor, I could use it in shape. And if I leave everything unchanged except putting did.swim in a factor function, it is officially a limited set, and I get my fancy graph where height is on the x-axis and weight is on the y-axis.
+
+As well as making a short term fix with factor inside the graph aesthetics, I could have also changed it permanently in my data before making a graph, like we did with the as.Date function.
+
+So, in giving it a go, do a one-off check if you have the package - that's ggplot2, run the code to load the library, then fix the code. And maybe try swapping out some of the column names with others to see how that effects graph making, for the fun.
+
+This isn't the ggplot course, so the take-homes today are it needs to be the right kind of data to do a job, and libraries have to be both installed and loaded. And keep that in mind when reading example code. Though it is a convention in examples that libraries come at the start of the file, so you can easily see what you are going to need later and get it sorted out.
+
+Okay, what I'd like to talk about next are calculated columns. And for doing a calculation in R, we have a before column of a before race pulse and an after column of after race pulse. And if we want a halfway point between them, we might say, reach into the pulse data and add the before column to the after column, and divide by 2.
+
+```
+pulse$mid <- pulse$before + pulse$after / 2
+```
+
+And, important point, this is not how calculations in Excel quite work. But it is how calculations work in other data analysis programs- Stata, SPSS, etc. In Excel you sort out a calculation with individual cells, then fill down. R is always thinking in terms of groups.
+
+So it's saying, Take every row of the before column and add each of them to the equivalent row of the after column. And that'll give us another column of answers, and then divide by 2. Do all that maths, and then use the arrow to store it somewhere. In this case, reach into the pulse and create a new column called mid and store it there, and if I run that I've got 60 observations of 13 variables.
+
+I've added a column. And I could use str and see the mid in there. And, in fact, in the Environment tab, if you click the little preview spreadsheet symbol to the left of pulse, you can look at the data if it is a spreadsheet kind of arrangement. And, if I do that, then I realize I made a mistake, because if I have a before race pulse of 77, and an after race pulse of 97, the midpoint is not a 125.5.
+
+The thing about maths is order of operation matters. it will always do division and multiplication before it does addition and subtraction. So when you are using maths, it can be really important to, just like at intermediate school, put things in parentheses.
+
+Now I'm correcting this line. If I run it again. all it's doing is redoing the maths, but adding those numbers together first. After it's dividing by 2, because it's outside of the parentheses, and finally storing it in mid. And because I reran that line, it replaces the existing mid. So, your turn.
+
+Something else to notice in the spreadsheet preview window, while the answer is now sensible, the third line, Jesse, has an NA answer. This was the entry that was blank in the after column in the orginal csv file. The after pulse is unknown - not available. NA.  
+
+And in R it means it's a missing value. And the halfway point between a known number and an unknown number is always an unknown number. So the maths answer was NA as well. And this is something that will vex you as you ask for numerical summaries and you get NA. What is the average of the entire column- it's unknown. While some numeric summary functions have settings to exclude NAs, we need to start thinking, maybe we don't always want to use all our data.
+
+Now, back earlier on, I made a histogram. That was a histogram of every entry in the data for that column.
+
+```
+hist(pulse$height)
+```
+
+Any time in R that you see square brackets, square brackets will always mean "but not all the entries, only selected entries". When I see 12 colon 30, that means from row 12 to row 30 of the current data in its current order, inclusive of both 12 and 30.
+
+```
+hist(pulse$height[12:30])
+```
+
+So if I say, make a histogram of the height- but not all the height, only rows 12 through 30, I get a very different shaped histogram with much less data in it. So one way is referring to things by its place in the data, but very often people want to refer to things by rules, by comparisons of information in columns. So I might, say, make me a histogram of the height, square brackets (but not all the height), column. To only use the rows in the height column where the rows in the gender column are equal to capital "F" as an entry, I
+ use two equals signs is test if the contents of the columns are equal to capital "F". One equal signs makes something equal to, and we've been using it when we've been setting arguments inside of functions.
+
+```
+hist(pulse$height[pulse$gender == "F"])
+```
+
+If the gender column row contains a capital "F", that is an entry I'm interested in. Take all the rows that have the capital F in them, and those are the rows that I want to use the height column for when making a histogram. And if I run that, I get a histogram of less than the full data, because it's only the entries where the gender column was equal to a capital "F".
+
+When you are writing rules, you can separate things out. So if I was writing "test if the gender column is equal to capital F", I could then say, do this test and store the results somewhere. Store it in a place I'm calling criteria.
+
+```
+criteria <- pulse$gender == "F"
+hist(pulse$height[criteria])
+```
+
+And if I run that, criteria is now basically its own separate column not stored with the data. It's a separate jar on the shelf, and it's logical, and it's full of FALSEs (which did not match) and TRUEs (which did match). But it is the same number of entries as there are rows in the data, so it is the list of which rows in the data match the rules. And I could then say, make a histogram of the height column, but not all the height column, square brackets only selected entries of the height column, the ones for which criteria is true, and that makes exactly the same histogram again.
+
+But it makes the histogram on a stored rule that I could, in fact, change just the rule later. Or I could fancy it up. And my reason for showing you this is both. It can be a tactic to do something, store it, and then be able to use it again later on in the process. But it's also going to make it easier over the next few steps while we are talking about compound rules to be able to clearly see the rule without all of the brackets and parentheses around it. Just keep in mind that changing the contents of criteria, by changing the rule and rerunning the code, doesn't change anything else until you use that new version of criteria. Which is why I am showing you you can select multiple lines and run them together.
+
+So for the moment. I'd just like you to have a play. Have a think about being able to select number ranges, and being able to use rules. Being able to store the results of tests and then reuse them. See if you've got any questions on that area.
+
+And now we're going to get into the "what if you want more complicated rules", because we might be interested in non-smokers who exercise at least 3 times a week and have no previous medical conditions, or something like that- selecting on the basis of information from a whole bunch of different columns. Okay, I'm going to doing things on computer for a moment, just so I can wave my hands with the next bit of explanation for compound questions that involve testing several different things at once. There are broadly 2 two ways of combining testing criteria. There are what are called logical ands that reduce the resulting group making the criteria tighter, and what are called logical ors which broadens the group.
+
+*I am starting with my hands far apart and moving one hand closer to the other each time I say "this must match"*
+
+For and, each test narrows the result. This must match, and this must match, and this must match, and this must match, and the entries that match every rule are the only entries that I want to work with.
+
+*I am starting with my hands closer together and moving one hand further a[art] to the other each time I say "or this is good"*
+
+Ors broaden out. This is good, or this is good, or this is good, or this is good. I would like to use all of the entries that meet any of the rules. 
+
+So you can be more specific in your group settings by using combinations of ands and ors. From one rule, if I want to narrow up the group further, I introduce another rule- an and rule- by using a ampersand. After the ampersand goes the full second rule. In this case lets only narrow the current set to people over 160 cm in height by full specifying to check the column in the pulse data for entries greater than 160 cm.
+
+```
+criteria <- pulse$gender == "F" & pulse$height > 160
+hist(pulse$height[criteria])
+```
+
+I get just the entries from the far right hand end of the previous histogram.
+
+If, rather than an ampersand, I use a vertical bar, a vertical bar is an or symbol. Holding down the shift kind and finding the slash above the Enter or Return key on the keyboard.
+
+```
+criteria <- pulse$gender == "F" | pulse$height > 160
+hist(pulse$height[criteria])
+```
+
+The amount on the right of the graph has dramatically increased, as it is now everyone coded F in the gender column together with anyone with a height greater than 160 cm (regardless of gender).
+
+So, between ands and ors, you can write some fairly complex queries. But, if you are combining lots of ands and ors, that's a time that you might start putting things in parentheses just like with maths. Order of operation matters just like we saw earlier, and you can control order of operation by putting rule combinations inside parenthese to get that group sorted out first (before combining it with other groups). R will start with the most inside ones and work its way out. So with the idea that ands are ampersands and ors are the vertical bar, let's give you a couple of minutes to have a play and have a think about compound logical tests, testing several things to find just the group you want. If the paratheses are not needed by the order of operation, then they do nothing, including nothing bad. If the paratheses are needed, then they have to be there to get the correct group. So, when in doubt, add parentheses.
+
+But none of that helps with the not available entry. Is the missing value bigger than something? Smaller than? Equal to? We don't know, because it is not available. So we use the is.na function, where we feed in a column of data, and the function locates the blank entries. So we could, weirdly, make a histogram of the heights for the one entry we do not have an after race pulse for.
+
+```
+criteria <- is.na(pulse$after)
+hist(pulse$height[criteria])
+```
+
+So what you normally want when you are working with data is the not blank ones, the entries for which you have data. If I was looking at hypothetical survey results, I might want to compare the people which are not blank for question 5 and not blank for question 14, as the group that answered both questions.
+
+Any time in R you see an exclamation mark, the exclamation mark means not these ones, all the rest, but not these ones. You just put it in front of the thing you are reversing by making it not.
+
+```
+criteria <- !is.na(pulse$after)
+hist(pulse$height[criteria])
+```
+
+Find the ones that are blank in the after column. Those are the ones I don't want. Exclamation Mark. If I then go on to make a histogram, it uses all but one entry in my data- excluding the blank one from the after column. So any time in example code, you see an exclamation mark. It is saying, Nope, not them, the reverse of them, all the other ones. This could be combined with parentheses and other compounding tests.
+
+Up until now we have been testing our data and then making a subset of that data and pulling it out and doing something with it, like making a graph. I want to stress, we can also use these kind of techniques for pushing in changes to selections of our data. Because we can put things into groups at any stage.
+
+
+```
+pulse$heightgroup <- "short"
+pulse$heightgroup[pulse$height > 155] <- "medium"
+pulse$heightgroup[pulse$height > 170] <- "tall"
+pulse$heightgroup[is.na(pulse$height)] <- NA
+```
+
+So I could say, Hey, pulse data, let's create a new column called height group. And let's fill that new column entirely with the word short. If I just ran that row. I get 13 variables, and if I looked at my data, I've got a new column entirely full of the word short. 
+
+But you can then use strategies like, let's take that new column, but not all the new column, only the entries where the equivalent height column row is greater than 155. So for that group only, take the word medium and push it in by following the arrow of assigning the data. All the data is still there, we only changed some of it. And the preview spreadsheet is filled with shorts and mediums.
+
+I could do the same thing again, saying take tall push it into the height group, but not all the height group, only the rows where the equivalent rows in the height column are greater than 170, and if I push in that one I get short, medium, and tall.
+
+And sometimes it's a really good think about blank entries, for instance in the height column. We made everything short, so clearly if there are blanks in the height column, we have just declared them short without knowledge of their height. We may then have changed their height group, as the rules for including or excluding blanks vary with the method you are using for picking the group. Is the method based on including entries known to match the rule, or excluding entries that do not match. Blanks will behave differently in those cases. Today, we are going to avoid the problem completely by just being really clear and handling blanks explicitly. After setting everything else, change any rows in heightgroup that are blank in the height column to NA not available. It doesn't matter what may have happened to that heightgroup entry previously, this is a final formal declaration of what to do.
+
+And that is one of the other things this section is illustrating: we can put or data into groups, and we can recode (which means formally recording groups within our data for ease of future use), but the order you do things matters. Particularly when you are changing the data. Playtime.
+
+We could do the same kind of thing to make corrections to our data, picking out entries by row number or by rule, and pushing in corrections. I have got a formal record of what I've done rather than just a a mysterious change to the original spreadsheet. So coming back to that audit trail idea.
+
+This putting things into new groups also underlies making clean data sets for specialist statistical tests- some statistical tests need to have complete entries with no blanks, or require there to be only numeric columns. So, we might try removing the row that is blank in the after column and storing the results in a new data set.
+
+```
+clean <- pulse[!is.na(pulse$after)]
+```
+
+But that gives an error about undefined columns. So somthing is up. We know the stuff in the square brackets is exactly the same as when we were using it with criteria, so it isn't a typo kind of problem. But what it is, is a right kind of data problem. What's going on there, is that when we were working with individual columns and the square brackets were saying for this particular column, dataset dollarsign column name, these are the rows that I want. Now, all of a sudden I'm dealing with 2 dimensional data with rows and columns, and I'm telling it which rows I want. But I haven't told it which columns I want. And if you are dealing with two-dimensional data, you need to tell it the rows and the columns, the height and the width. If you are dealing with 3 dimensional data, imaging data is the commonest, you need to tell it the height, width, and depth that you want. So I put in a comma inside the square brackets, for I know that there are columns as well. If I want all the columns, I could just leave that as is.
+
+```
+clean <- pulse[!is.na(pulse$after),]
+```
+
+And if I run that I get my revised data set. Before the comma is rows, and after the comma is columns. If I leave either side blank, like the right column side is blank, the comma acknowledges that I know there are 2 dimensions and the blank side brings everything in that dimension back. So that is why we get all the columns if we put nothing in.
+
+But if I want specific columns, I could use the number ranges like we used earlier with rows. I could say, I want the 3rd column to the 10th column inclusive. Can I run that?
+
+```
+clean <- pulse[!is.na(pulse$after),3:10]
+```
+
+And I get 8 columns. But something you'll see a lot, used in places like this, is the c function for combine. Make me a little group. I could use that with numbers.
+
+```
+clean <- pulse[!is.na(pulse$after), c(1,3,5:8)]
+```
+
+I want the 1st column. I want the 3rd column. And I also want the 5th through 8th inclusive from my original data. But because the columns also have names and names are bits of text and provide that list by name.
+
+```
+clean <- pulse[!is.na(pulse$after), c("height","weight","before","after")]
+```
+
+Make me a little group. I want to combine these names together for the names of the columns that I want. If I run that, I get my block of data with 4 columns in it. I am calling playtime again to see what questions occur.
+
+If you want to select both rows and columns as a block of data. You need to tell it both what rows, then a comma, and then what columns you want. and let's have a couple of minutes of play and see what questions occur about picking out blocks of data very often done, because you need to ready your data for some fancy statistical thing can probably guess we're going on to talk about fancy statistical tests. Just give you another minute to get any questions. Okay?
+
+So to fancy statistical tests. There are various statistical tests I am prepared to demonstrate in a live demo so I'll list them and the first person to ask for one of those gets the demo: principal component analysis, linear regression, ANOVA, logistic regression, Chi squared. But really, I'm just going to use this as an opportunity of showing how statistical tests in our work. 
+
+So a linear regression is, how much does a dependent, variable change as a result of other variables in the data change. And that can be things like, how much does the after race pulse change on the basis of what the before race pulse was how much of a relationship between the 2 are there? And there is an lm function for linear model. So I might decide to use it.
+
+```
+answer <- lm(after ~ before, data=clean)
+```
+
+And I'm going to go "after tilde before". remembering back when we made the first graphs, Tilde, whenever you saw it meant controlled by, or dependent on or grouped by. So for the linear model, the how much is the after column dependent on the before column? And I've got a second setting of data equals clean where I tell it what data to use. 
+
+I'm not writing clean dollar sign after and clean dollar sign before, because this linear model function has an optional data setting that I can put in a block of data. And then I'm just saying use these columns from it, because it knows where to look.
+
+And in fact, I glossed over doing that earlier when we made the ggplot graph where we put in the block of data, and we were just referring to columns by their individual names in the aesthetics, because it knows where to look. 
+
+So I could make that linear model and store the result, in this case labelled answer.
+
+And if I just type answer, I am spilling the jar over the benchtop and see some coefficients. This is for each unit of change in the before race pulse, this is how much the after race pulse changes.
+
+Then, because I stored it, I can do things like- back when we read in the data. I used the summary command- and I could ask for the summary of this result. I get a whole lot more detail about that statistical result. I get the P values, and so on, and so on. The adjusted, the R squared values. Those kind of things.
+
+When I read the data in, I talked about how useful the str function is for finding out the internal structure of the data. What kind of columns you're working with. So I can run the str for the result. And it is a complicated internal structure.
+
+There's a lot there. I won't pretend otherwise. But, for instance, there is the coefficients as a named area inside it. and that means that if I have saved the results of the statistical test. I can go.
+
+```
+answer$coefficients
+```
+
+Hey, result dollar sign reaching inside symbol coefficients. Now I can get access to those numbers. But if I want the 1st coefficient, the intercept value I might go results coefficients. square brackets, not all the coefficients. Just the 1st one.
+
+```
+answer$coefficients[1]
+```
+
+So, I can now use that number elsewhere. So the big point I'm making here is that statistical tests in R are a bit different to statistical tests in most other packages, because they don't have to be the end of the line. You don't have to just look at the statistical result. You can take the numbers that it produces, and you can save those numbers, and you can use them elsewhere, and that gives you a certain amount of flexibility. The big idea around that is just that the statistical test produces a result which you can treat as more data for doing more things with.
+
+Now, I do want to talk a little bit about the helper library dplyr as well, because you'll see that in a lot of recent R tutorials and guidance that focus on what is called the tidyverse, which it is a part of. Because dplyr is a helper library, I would have to have that installed inside my packages area, and to use it I would have to load it with a library command. 
+
+It's trying to create a grammar of data analysis with a whole lot of common tasks in it. So to explain it, dplyr is thinking very much in terms of a flow of the data through a series of data analysis steps. And it can use a symbol for carrying the data to the next step, called piping. It's a plumbing metaphor. There are a couple of such symbols you might see in reading. There is a percentage sign, a greater than, and a percentage sign. Or there is another one that basically works the same way, which is a vertical bar greater than sign. You can think of both symbols as "and then". And then do this, and then do this.
+
+```
+library(dplyr)
+pulse %>%
+  filter(!is.na(after)) %>%
+  mutate(pulsechange = after-before)
+  group_by(gender, did.swim) %>%
+  summarise(mean_change = mean(pulsechange),
+            median_change = median(pulsechange),
+            entry_count = n())
+```
+
+We are piping our data from one step to the next step. doing things with the data along the way. Taking pulse as a starter. Pipe it on. And then.
+
+Filter it to remove impurities. This is like picking out rows earlier- I want to find the ones that are not blank in the after column. We aren't writing pulse dollar sign after, because we are feeding in the pulse data, and this is like other occasions where we are telling it the data so it looks there. And then I want to do something else.
+
+Mutate is used for a section creating new calculated columns. In this case a mathematical calculation like we did earlier. And then.
+
+Group by the gender and did they swim columns. And this is one of the big reasons you might see examples of dplyr code. If you want to make summaries of your data by group, dplyr is a very easy way to do that. Put it into groups for every combination of the gender column and the did they swim column in my data and then do something with each group. 
+
+In this case, calculate some summaries for each group, calculations that take a bunch of datra from a column and produce a single summary value, like the mean or median of a column of numbers, or a count of the number of values.
+
+So the reason I'm introducing it in this session is a lot of recent tutorials will use dplyr and related libraries, known as the tidyverse. And you may well see piping steps carrying the data from one step next step rather than saving it as separate objects in the environment tab along the way. Though if we did want to save the results, we could do what we always do and build an arrow at the start and give a label to refer to it by.
+
+Now, I've been talking a lot about this session helping you understand example code you see when you do further reading. So, let's talk further reading.
+
+*Show The Big Book of R in a web browser*
+
+The big book of R is a web directory of hundreds of R references, most of them free, organised by subject area.
+
+*If participants have access to an academic library via the web, show subject search, for my one it is R (computer program language)*
+
+I can go to the Library. And in the library there is a search window, and I am not typing in the letter R, because they would find way too many things. But rather than looking for everything, I'm going to advance search which is a little link to the right of the search button. And rather than looking for any field I'm going to look for subject contains R parenthesis Computer program language parenthesis. I could set it to only see the book results, and if I click search here are all 418 books available from the University library as we speak, mostly ebooks that you can look at at your computer while you are pondering things. 
+
+Without going to the web, there are often other resources within R for helper libraries. If I have installed a helper library, and click on the name of the library in the packages tab, I see the documentation. For example, if we had heard that the lubridate package was an excellent helper library for working with dates, and we had indeed heard correctly, we might click on its name. We will be able to see the functions in the package and can browser their help files, but newer more developed packages also a vignettes. Human explanations of what the package is for and how to use it. 
+
+
+Now, I've been working with this script file, and I might well go save because I want to save it and come back another day to be able to repeat. and the idea is, I could close up everything, and I will, in fact, completely quit. Now I come back another day I open up RStudio. and I do those 1st couple of steps that we did in this session. Again I use the session menu set Working Directory, choose Directory to find my project folder wherever it might be, and because it's months later it might be in a different place.
+
+Once I've found my project folder, I can open up my file and finding the R scripts I want to run (because I could have more than one, because I might have tried different approaches). And if I open up an R script like the past 2 hours of work, I could rerun individual lines. I could select several lines and run them all as a group. Or I could just hit the source button up the top of the file for runing every single command in this saved file. And I've just repeated the past 2 hours work in a few seconds. 
+
+If I decided I want to take a slightly different approach, I could always use Save As to save these commands under a slightly different name.
+
+If we want to get data out, we might load specialist library to be able to save data in specialist formats for other programs, but if a csv is good enough, there was a read.csv function used at the start, and there is a write.csv function for going the other way. I might save out the pulse data, with the setting file for the name of the file, in quotes as it is text. Because I am not including the pathway as part of the name, it just saves that file into the folder you told it to pay attention to. The working directory. I am also going to set the row.names setting by yelling, in a typographical sense, FALSE at it, since I do not want to include the row numbers they were currently set to in R. If I run that line, then my working Directory has a new file in it called New Csv, that is, the changed data. I've still got my original data in the pulse csv, so you can save data out of R at any time. 
+
+I've also got a general bit of advice about Rstudio settings. I'm going to strongly recommend changing this, because you can come back months later and rerun things by rerunning the script. I strongly advise going to the Tools, menu, and in the Tools menu there is Global Options. Global options, under General, has a setting of Restore R data into workspaces startup that is ticked by default. I suggest you take the tick out, and you might also want to set save on exit to never the and click Apply.
+
+The reason for taking the tick out is that, if the tick is on, when you start R it'll remember everything from last time, and load in everything that was there and this can lead to rubbish building up over time.
+
+It's a much safer, better, way to not automatically load things in- to take that tick out of global options. Remove that tick so that each time you start up R, it starts up new, empty and fresh. And if you're keeping things in script files, you can just rerun the scripts for the data you want on that day. So that's just a general recommendation.
+
